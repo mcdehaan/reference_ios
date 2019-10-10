@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<testsuites name='ReferenceiOSUITests.xctest' tests='3' failures='0'>
+  <testsuite name='ReferenceiOSUITests.ReferenceiOSUITests' tests='3' failures='0'>
+    <testcase classname='ReferenceiOSUITests.ReferenceiOSUITests' name='testLabelDefaultText' time='4.847'/>
+    <testcase classname='ReferenceiOSUITests.ReferenceiOSUITests' name='testLabelTextChangeOnButtonPress' time='5.472'/>
+    <testcase classname='ReferenceiOSUITests.ReferenceiOSUITests' name='testLabelTextChangeOnMultipleButtonPress' time='6.601'/>
+  </testsuite>
+</testsuites>

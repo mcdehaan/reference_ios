@@ -1,0 +1,82 @@
+default_platform(:ios)
+
+before_all do
+  setup_jenkins
+end
+
+platform :ios do
+  desc "Upload to HockeyApp"
+  lane :deploy_to_hockey do
+    app_id = "c2a2c993bd1d4898bba52324fb431e96"
+    package_name = "./ReferenceiOS.ipa"
+    changes = make_changelog_from_jenkins
+    hockey(
+      api_token: ENV["hockeyAppApiKey"],
+      ipa: package_name,
+      create_status: "2",
+      public_identifier: app_id,
+      notes: "JENKINS ##{ENV['BUILD_NUMBER']}\n#{changes}",
+      notify: "0",
+      bypass_cdn: true
+    )
+  end
+
+  desc "Run unit tests"
+  lane :test_unit do
+    scan(scheme: "ReferenceiOS")
+  end
+
+  desc "Run UI tests"
+  lane :test_ui do
+    scan(scheme: "ReferenceiOSUITests")
+  end
+
+  desc "Build the app"
+  lane :develop do
+    match(
+      git_url: "ssh://git@p-bitbucket.nl.eu.abnamro.com:8444/mobi/ios-certs-development.git",
+      readonly: true,
+      type: "enterprise",
+      shallow_clone: true,
+      clone_branch_directly: true,
+    )
+    gym(
+      scheme: "ReferenceiOS",
+      configuration: "Enterprise",
+      export_method: "enterprise",
+      output_name: "ReferenceiOS.ipa",
+      output_directory: ".",
+      archive_path: "ReferenceiOS.xcarchive",
+      include_bitcode: false,
+      export_options: {
+        uploadBitcode: false,
+        uploadSymbols: true,
+        compileBitcode: false
+      }
+    )
+  end
+
+  desc "Build the app"
+  lane :nightly do
+    develop
+  end
+
+  desc "Build the release app"
+  lane :release do
+    match(
+      git_url: "ssh://git@p-bitbucket.nl.eu.abnamro.com:8444/mobi/ios-certs-development.git",
+      readonly: true,
+      type: "appstore",
+      shallow_clone: true,
+      clone_branch_directly: true,
+    )
+    gym(
+      scheme: "ReferenceiOS",
+      configuration: "Release",
+      export_method: "app-store",
+      output_name: "ReferenceiOS-release.ipa",
+      output_directory: ".",
+      archive_path: "ReferenceiOS-release.xcarchive"
+    )
+  end
+end
